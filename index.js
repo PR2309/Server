@@ -66,7 +66,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // const PORT = process.env.PORT || 8080;
-const PORT = "https://sparkv-server.onrender.com/";
+const PORT = process.env.PORT || "https://sparkv-server.onrender.com/";
 
 // Function to run the AI model
 async function run(name, problem) {
