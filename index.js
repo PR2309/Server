@@ -22,7 +22,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 // CORS configuration
-const allowedOrigins = ['https://6696719-gleeful-malasada-bbcb5a.netlify.app', 'https://cool-llama-1258e5.netlify.app'];
+const allowedOrigins = ['https://6696719-gleeful-malasada-bbcb5a.netlify.app', 'https://cool-llama-1258e5.netlify.app','https://669bd01952b0897f86c8822a--statuesque-brioche-372030.netlify.app'
+];
 
 app.use(cors({
     origin: function (origin, callback) {
