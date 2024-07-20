@@ -2,6 +2,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
 const router = require('./routes/index');
 const connectDB = require('./models/db');
 const cookieParser = require('cookie-parser');
@@ -11,42 +12,30 @@ const path = require('path');
 
 const app = express();
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
 
-// Static files
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY); // Use environment variable for API key
+
+app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Body parser middleware
-app.use(bodyParser.json());
+app.use(cors({
+    origin: ['https://669bd5c266c77385f20ce211--sparkling-swan-833f8d.netlify.app'], 
+   
+    credentials: true,
+}));
+app.options('*', cors());
 app.use(express.json());
 app.use(cookieParser());
 
-// CORS configuration
-const allowedOrigins = ['https://669bd5c266c77385f20ce211--sparkling-swan-833f8d.netlify.app/'];
-
-app.use(cors({
-    origin: function (origin, callback) {
-        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-}));
-
-// Handle preflight requests
-app.options('*', cors());
-
 const PORT = process.env.PORT || 8080;
+// const PORT = process.env.PORT || "https://sparkv-server.onrender.com/";
+
 
 async function run(name, problem) {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const prompt = `You are an assistant for a Roadmap Website named SparkV. I am a user named ${name} and I want you to write a roadmap for me if ${problem}`;
     console.log("Question: " + prompt);
-
+    
     try {
         const result = await model.generateContent(prompt);
         const text = result.response.text();
@@ -57,6 +46,7 @@ async function run(name, problem) {
         throw new Error("Failed to generate content");
     }
 }
+
 
 app.use('/api', router);
 app.post('/ai/ans', async (req, res) => {
