@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors({
-    origin: ['https://669bd5c266c77385f20ce211--sparkling-swan-833f8d.netlify.app'], 
+    origin: ['https://sparkv-roadmaps.netlify.app'], 
    
     credentials: true,
 }));
