@@ -19,9 +19,8 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors({
-    origin: ['https://6696719-gleeful-malasada-bbcb5a.netlify.app', 'https://cool-llama-1258e5.netlify.app'], // Your allowed origins
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    origin: ['https://6696719-gleeful-malasada-bbcb5a.netlify.app', 'https://cool-llama-1258e5.netlify.app'], 
+   
     credentials: true,
 }));
 
