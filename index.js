@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors({
-    origin: process.env.FRONTEND_URL,
+    origin: 'https://6696719-gleeful-malasada-bbcb5a.netlify.app',
     credentials: true
 }));
 
