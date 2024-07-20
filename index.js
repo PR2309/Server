@@ -20,7 +20,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors({
     origin: 'https://6696719-gleeful-malasada-bbcb5a.netlify.app',
-    credentials: true
+    credentials: true,
 }));
 
 app.use(express.json());
