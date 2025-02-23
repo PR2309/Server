@@ -2,7 +2,6 @@ const dotenv = require('dotenv');
 dotenv.config();
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
 const router = require('./routes/index');
 const connectDB = require('./models/db');
 const cookieParser = require('cookie-parser');
@@ -12,33 +11,38 @@ const path = require('path');
 
 const app = express();
 
-
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
 
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(cors({
-    origin: [
-        'https://sparkv-roadmaps.netlify.app'// ✅ Your frontend (Netlify)
-        // 'http://localhost:3000' // ✅ For local testing
-    ],
-    credentials: true, // ✅ Allow cookies & authentication headers
-}));
+// ✅ Allowed origins
+const allowedOrigins = ['https://sparkv-roadmaps.netlify.app'];
 
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    if (allowedOrigins.includes(origin)) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    next();
+});
 
-app.options('*', cors());
 app.use(express.json());
 app.use(cookieParser());
 
 const PORT = process.env.PORT || 8080;
-// const PORT = process.env.PORT || "https://sparkv-server.onrender.com/";
 
-
-async function run(name,age,level,language,days,problem) {
+// ✅ AI Function
+async function run(name, age, level, language, days, problem) {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const prompt = `Your are a friendly assistant for a Roadmap Website named SparkV. I am a user named ${name}, having age ${age}, I am at ${level} level in ${language}, I have ${days}, Provide a roadmap customised according to the data I provided, if ${problem}, In JSON format.`;
-    // const prompt = `You are an assistant for a Roadmap Website named SparkV. I am a user named ${name} and I want you to write a roadmap for me if ${problem}`;
+    
     console.log("Question: " + prompt);
     
     try {
@@ -52,12 +56,12 @@ async function run(name,age,level,language,days,problem) {
     }
 }
 
-
 app.use('/api', router);
+
 app.post('/ai/ans', async (req, res) => {
-    const {name,age,level,language,days,problem} = req.body;
+    const { name, age, level, language, days, problem } = req.body;
     try {
-        const letter = await run(name,age,level,language,days,problem);
+        const letter = await run(name, age, level, language, days, problem);
         res.json({ letter });
     } catch (error) {
         console.error(error);
@@ -65,10 +69,11 @@ app.post('/ai/ans', async (req, res) => {
     }
 });
 
+// ✅ Connect to DB & Start Server
 connectDB().then(() => {
     app.listen(PORT, () => {
-        console.log(`Server running at http://localhost:${PORT}`);
+        console.log(`🚀 Server running at http://localhost:${PORT}`);
     });
 }).catch((error) => {
-    console.error("Failed to connect to the database:", error);
+    console.error("❌ Failed to connect to the database:", error);
 });
