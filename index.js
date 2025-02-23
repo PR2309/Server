@@ -13,16 +13,22 @@ const path = require('path');
 const app = express();
 
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY); // Use environment variable for API key
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
 
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+const cors = require('cors');
+
 app.use(cors({
-    origin: ['https://sparkv-roadmaps.netlify.app'], 
-   
-    credentials: true,
+    origin: [
+        'https://sparkv-roadmaps.netlify.app', // ✅ Your frontend (Netlify)
+        'http://localhost:3000' // ✅ For local testing
+    ],
+    credentials: true, // ✅ Allow cookies & authentication headers
 }));
+
+
 app.options('*', cors());
 app.use(express.json());
 app.use(cookieParser());
@@ -31,9 +37,10 @@ const PORT = process.env.PORT || 8080;
 // const PORT = process.env.PORT || "https://sparkv-server.onrender.com/";
 
 
-async function run(name, problem) {
+async function run(name,age,level,language,days,problem) {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const prompt = `You are an assistant for a Roadmap Website named SparkV. I am a user named ${name} and I want you to write a roadmap for me if ${problem}`;
+    const prompt = `Your are a friendly assistant for a Roadmap Website named SparkV. I am a user named ${name}, having age ${age}, I am at ${level} level in ${language}, I have ${days}, Provide a roadmap customised according to the data I provided, if ${problem}, In JSON format.`;
+    // const prompt = `You are an assistant for a Roadmap Website named SparkV. I am a user named ${name} and I want you to write a roadmap for me if ${problem}`;
     console.log("Question: " + prompt);
     
     try {
@@ -50,9 +57,9 @@ async function run(name, problem) {
 
 app.use('/api', router);
 app.post('/ai/ans', async (req, res) => {
-    const { name, problem } = req.body;
+    const {name,age,level,language,days,problem} = req.body;
     try {
-        const letter = await run(name, problem);
+        const letter = await run(name,age,level,language,days,problem);
         res.json({ letter });
     } catch (error) {
         console.error(error);
@@ -62,7 +69,7 @@ app.post('/ai/ans', async (req, res) => {
 
 connectDB().then(() => {
     app.listen(PORT, () => {
-        console.log("Server running at " + PORT);
+        console.log(`Server running at http://localhost:${PORT}`);
     });
 }).catch((error) => {
     console.error("Failed to connect to the database:", error);
