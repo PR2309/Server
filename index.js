@@ -18,8 +18,6 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-const cors = require('cors');
-
 app.use(cors({
     origin: [
         'https://sparkv-roadmaps.netlify.app', // ✅ Your frontend (Netlify)
