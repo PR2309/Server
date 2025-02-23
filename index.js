@@ -20,8 +20,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(cors({
     origin: [
-        'https://sparkv-roadmaps.netlify.app', // ✅ Your frontend (Netlify)
-        'http://localhost:3000' // ✅ For local testing
+        'https://sparkv-roadmaps.netlify.app'// ✅ Your frontend (Netlify)
+        // 'http://localhost:3000' // ✅ For local testing
     ],
     credentials: true, // ✅ Allow cookies & authentication headers
 }));
