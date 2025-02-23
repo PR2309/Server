@@ -10,70 +10,75 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const path = require('path');
 
 const app = express();
+const PORT = process.env.PORT || 8080;
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
 
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ✅ Allowed origins
+// ✅ CORS Setup (Fixes the Issue)
 const allowedOrigins = ['https://sparkv-roadmaps.netlify.app'];
 
-app.use((req, res, next) => {
-    const origin = req.headers.origin;
-    if (allowedOrigins.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-        res.setHeader('Access-Control-Allow-Credentials', 'true');
-    }
-    if (req.method === 'OPTIONS') {
-        return res.sendStatus(200);
-    }
-    next();
-});
+const corsOptions = {
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: 'GET, POST, PUT, DELETE, OPTIONS',
+    allowedHeaders: 'Content-Type, Authorization',
+    credentials: true,
+};
 
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
-
-const PORT = process.env.PORT || 8080;
 
 // ✅ AI Function
 async function run(name, age, level, language, days, problem) {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const prompt = `Your are a friendly assistant for a Roadmap Website named SparkV. I am a user named ${name}, having age ${age}, I am at ${level} level in ${language}, I have ${days}, Provide a roadmap customised according to the data I provided, if ${problem}, In JSON format.`;
-    
-    console.log("Question: " + prompt);
-    
+    const prompt = `You are a friendly assistant for a Roadmap Website named SparkV. 
+    I am a user named ${name}, aged ${age}. I am at ${level} level in ${language}, and I have ${days} days to learn. 
+    Provide a roadmap customized according to my details. Also consider ${problem}, if mentioned. 
+    Response must be in JSON format.`;
+
+    console.log("Generated Prompt: ", prompt);
+
     try {
         const result = await model.generateContent(prompt);
         const text = result.response.text();
-        console.log("Answer: " + text);
+        console.log("AI Response: ", text);
         return text;
     } catch (error) {
-        console.error("Error generating content:", error);
+        console.error("Error generating AI content:", error);
         throw new Error("Failed to generate content");
     }
 }
 
+// ✅ API Routes
 app.use('/api', router);
 
 app.post('/ai/ans', async (req, res) => {
     const { name, age, level, language, days, problem } = req.body;
     try {
-        const letter = await run(name, age, level, language, days, problem);
-        res.json({ letter });
+        const roadmap = await run(name, age, level, language, days, problem);
+        res.json({ roadmap });
     } catch (error) {
         console.error(error);
-        res.status(500).send('An error occurred');
+        res.status(500).json({ error: 'An error occurred while processing your request' });
     }
 });
 
 // ✅ Connect to DB & Start Server
-connectDB().then(() => {
-    app.listen(PORT, () => {
-        console.log(`🚀 Server running at http://localhost:${PORT}`);
+connectDB()
+    .then(() => {
+        app.listen(PORT, () => {
+            console.log(`🚀 Server running at http://localhost:${PORT}`);
+        });
+    })
+    .catch((error) => {
+        console.error("❌ Failed to connect to the database:", error);
     });
-}).catch((error) => {
-    console.error("❌ Failed to connect to the database:", error);
-});
