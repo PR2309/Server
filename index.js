@@ -17,21 +17,28 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ✅ Proper CORS Setup
-const allowedOrigins = ['https://sparkv-roadmaps.netlify.app'];
-app.use(cors({
-    // origin: function (origin, callback) {
-    //     if (!origin || allowedOrigins.includes(origin)) {
-    //         callback(null, origin);
-    //     } else {
-    //         callback(new Error('Not allowed by CORS'));
-    //     }
-    // },
-    origin: allowedOrigins[0],
+// const allowedOrigins = ['https://sparkv-roadmaps.netlify.app'];
+// app.use(cors({
+//     // origin: function (origin, callback) {
+//     //     if (!origin || allowedOrigins.includes(origin)) {
+//     //         callback(null, origin);
+//     //     } else {
+//     //         callback(new Error('Not allowed by CORS'));
+//     //     }
+//     // },
+//     origin: allowedOrigins[0],
+//     credentials: true,
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//     allowedHeaders: ['Content-Type', 'Authorization']
+// }));
+const corsOptions = {
+    origin: ['http://localhost:3000', 'https://sparkv-roadmaps.netlify.app'],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
+    optionsSuccessStatus: 204,
+};
 
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
