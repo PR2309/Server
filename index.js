@@ -19,13 +19,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 // ✅ Proper CORS Setup
 const allowedOrigins = ['https://sparkv-roadmaps.netlify.app'];
 app.use(cors({
-    origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, origin);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+    // origin: function (origin, callback) {
+    //     if (!origin || allowedOrigins.includes(origin)) {
+    //         callback(null, origin);
+    //     } else {
+    //         callback(new Error('Not allowed by CORS'));
+    //     }
+    // },
+    origin: allowedOrigins[0],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
