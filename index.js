@@ -16,6 +16,7 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
 // ✅ Proper CORS Setup
 const corsOptions = {
     origin: 'https://sparkv-roadmaps.netlify.app',
+    // origin: 'http://localhost:3000', // for testing
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 
     credentials: true,
@@ -58,7 +59,8 @@ app.post('/ai/ans', async (req, res) => {
         res.json({ letter });
     } catch (error) {
         console.error(error);
-        res.status(500).send('An error occurred');
+        res.status(500).json({ error: 'An error occurred' });
+        // res.status(500).send('An error occurred');
     }
 });
 
