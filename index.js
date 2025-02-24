@@ -13,27 +13,11 @@ const app = express();
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
 
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
-
 // ✅ Proper CORS Setup
-// const allowedOrigins = ['https://sparkv-roadmaps.netlify.app'];
-// app.use(cors({
-//     // origin: function (origin, callback) {
-//     //     if (!origin || allowedOrigins.includes(origin)) {
-//     //         callback(null, origin);
-//     //     } else {
-//     //         callback(new Error('Not allowed by CORS'));
-//     //     }
-//     // },
-//     origin: allowedOrigins[0],
-//     credentials: true,
-//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-//     allowedHeaders: ['Content-Type', 'Authorization']
-// }));
 const corsOptions = {
-    origin: ['http://localhost:3000', 'https://sparkv-roadmaps.netlify.app'],
+    origin: 'https://sparkv-roadmaps.netlify.app',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+
     credentials: true,
     optionsSuccessStatus: 204,
 };
@@ -41,6 +25,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 const PORT = process.env.PORT || 8080;
 
