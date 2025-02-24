@@ -33,7 +33,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 const PORT = process.env.PORT || 8080;
 
 // ✅ AI Function
+let lastRequestTime = 0;
+const requestDelay = 60000 / 60; // 60 requests per minute = 1 request per second
 async function run(name, age, level, language, days, problem) {
+    // delay
+    const now = Date.now();
+    const timeSinceLastRequest = now - lastRequestTime;
+
+    if (timeSinceLastRequest < requestDelay) {
+        await new Promise(resolve => setTimeout(resolve, requestDelay - timeSinceLastRequest));
+    }
+    lastRequestTime = Date.now();
+
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const prompt = `Your are a friendly assistant for a Roadmap Website named SparkV. I am a user named ${name}, having age ${age}, I am at ${level} level in ${language}, I have ${days}, Provide a roadmap customised according to the data I provided, if ${problem}, In JSON format.`;
     
