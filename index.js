@@ -46,8 +46,12 @@ async function run(name, age, level, language, days, problem) {
     lastRequestTime = Date.now();
 
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const prompt = `Your are a friendly assistant for a Roadmap Website named SparkV. I am a user named ${name}, having age ${age}, I am at ${level} level in ${language}, I have ${days}, Provide a roadmap customised according to the data I provided, if ${problem}, In JSON format.`;
-    
+    const prompt = `You are a friendly assistant for a Roadmap Website named SparkV. 
+I am a user named ${name}, aged ${age}. I am at ${level} level in ${language}, and I have ${days} days to study. 
+Provide a structured roadmap in a simple, step-by-step format using bullet points. 
+Each step should be clear and easy to follow. If there is a specific problem (${problem}), address it accordingly. 
+DO NOT return JSON, code blocks, or special formatting. Just provide a normal text response in a document-style format.`;
+
     console.log("Question: " + prompt);
     
     try {
